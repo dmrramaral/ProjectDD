@@ -1,0 +1,19 @@
+ .cardsSpells{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: stretch;
+
+}
+
+:host p-button, :host p-dropdown {
+
+  margin: 1rem;
+}
+
+.filters{
+  margin-top: 1rem;
+}
+
+

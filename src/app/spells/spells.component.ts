@@ -12,7 +12,10 @@ import { SpellsService } from './spells.service';
 import { MessageService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 @Component({
   selector: 'app-spells',
   standalone: true,
@@ -26,7 +29,10 @@ import { InputNumberModule } from 'primeng/inputnumber';
     ButtonModule,
     CardModule,
     InputTextModule,
-    InputNumberModule
+    InputNumberModule,
+    TableModule,
+    IconFieldModule,
+    InputIconModule
   ],
   templateUrl: './spells.component.html',
   styleUrls: ['./spells.component.scss'],
@@ -41,10 +47,10 @@ export class SpellsComponent implements OnInit {
   spellsByClass: { [className: string]: Spell[] } = {};
   spellsLoaded: boolean = false;
 
-  filterName!: string;
+  filterName: string = '';
   filterLevel!: number;
-  filterType!: string;
-  filterSchool!: string;
+  filterType: string = '';
+  filterSchool: string = '';
 
   nameOptions: any[] = [];
   levelOptions: any[] = [];
@@ -73,30 +79,24 @@ export class SpellsComponent implements OnInit {
 
   initializeFilters() {
     // Inicializar opções de filtros
-    console.log(this.spellsData);
     // Usar Set para garantir que os nomes sejam únicos
+
     const nameSet = new Set(this.spellsData.map(spell => spell.name));
     this.nameOptions = Array.from(nameSet).map(name => ({ name }));
 
-    const levelSet = new Set(this.spellsData.map(spell => spell.level));
-    this.levelOptions = Array.from(levelSet).map(level => ({ level }));
-    this.schoolOptions = this.spellsData.reduce((options: any[], spell: Spell) => {
-      const schoolName = spell.school.name;
-      if (!options.some((option: any) => option.school === schoolName)) {
-        options.push({ school: schoolName });
-      }
-      return options;
-    }, []);
-    console.log(this.nameOptions);
   }
 
   applyFilters() {
     this.filteredSpells = this.spellsData.filter(spell => {
-      const matchesName = this.filterName ? spell.name.includes(this.filterName) : true;
-      const matchesLevel = this.filterLevel ? spell.level === this.filterLevel : true;
-      const matchesSchool = this.filterSchool ? spell.school.name.includes(this.filterSchool) : true;
-      return matchesName && matchesLevel && matchesSchool;
+      return this.filterName.includes(spell.name);
     });
+    console.log(this.spellsData);
+    console.log(this.nameOptions);
+
+    console.log(this.spellsData.filter(spell => {
+      return this.nameOptions.some(option => option.name === spell.name);
+    }));
+    console.log(this.filteredSpells);
   }
 
 
@@ -129,10 +129,9 @@ export class SpellsComponent implements OnInit {
             this.spellsByClass[cls.index].push(spellDetails);
           });
         });
-
         this.spellsLoaded = true;
         this.sortSpellsByLevel();
-        this.initializeFilters();
+
         this.showToast();
       });
     });
@@ -148,6 +147,7 @@ export class SpellsComponent implements OnInit {
     for (let className in this.spellsByClass) {
       this.spellsByClass[className].sort((a, b) => a.level - b.level);
     }
+
   }
 
   getClassNames(spell: Spell): string {
@@ -174,6 +174,7 @@ export class SpellsComponent implements OnInit {
         });
         this.initializeFilters();
       });
+
     } else {
       this.spellsData = [];
       console.log("No class selected or no spells for selected class");

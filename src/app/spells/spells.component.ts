@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DropdownModule } from 'primeng/dropdown';
 import { MessageModule } from 'primeng/message';
@@ -11,7 +10,7 @@ import { forkJoin } from 'rxjs';
 import { Spell } from '../models/spell';
 import { SpellsService } from './spells.service';
 import { MessageService } from 'primeng/api';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ButtonModule } from 'primeng/button';
 @Component({
   selector: 'app-spells',
   standalone: true,
@@ -61,6 +60,10 @@ export class SpellsComponent implements OnInit {
       .replace(/\| (.*?) \|/g, '<table><tr><td>$1</td></tr></table>'); // Table (simplified)
 
     return this.sanitizer.bypassSecurityTrustHtml(formattedDescription);
+  }
+
+  getDamageLevels(damage: any): string[] {
+    return Object.keys(damage);
   }
 
 

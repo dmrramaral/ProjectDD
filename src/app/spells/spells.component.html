@@ -6,7 +6,8 @@
 <p-button *ngIf="spellsLoaded" label="Filtrar Magias" icon="pi pi-filter" (click)="filterSpellsByClass()"></p-button>
 
 <div *ngIf="spellsData.length > 0">
-  <p-card *ngFor="let spell of spellsData" header="{{ spell.name }} (Level {{ spell.level }})">
+  <p-card *ngFor="let spell of spellsData" [header]="spell.name + ' (Level ' + spell.level + ')'" subheader="Spell Details" [style]="{ width: '360px', margin: '1rem', font:'strong' }">
+
     <ng-template pTemplate="content">
       <div *ngIf="spellDescriptions[spell.url]">
         <p><strong>Description:</strong> <span [innerHTML]="formatDescription(spellDescriptions[spell.url].desc)"></span></p>
@@ -16,13 +17,24 @@
         <p><strong>Duration:</strong> {{ spellDescriptions[spell.url].duration }}</p>
         <p><strong>Concentration:</strong> {{ spellDescriptions[spell.url].concentration ? 'Yes' : 'No' }}</p>
         <p><strong>Casting Time:</strong> {{ spellDescriptions[spell.url].casting_time }}</p>
-        <p><strong>Damage:</strong> {{ spellDescriptions[spell.url].damage?.damage_at_character_level | json }}</p>
+        <div *ngIf="spellDescriptions[spell.url].damage">
+          <p><strong>Damage:</strong></p>
+          <ul>
+            <li *ngFor="let level of getDamageLevels(spellDescriptions[spell.url].damage)">
+              Level {{ level }}: {{ spellDescriptions[spell.url].damage[level] }}
+            </li>
+          </ul>
+        </div>
         <p *ngIf="spellDescriptions[spell.url].dc"><strong>DC:</strong> {{ spellDescriptions[spell.url].dc.dc_type?.name }} ({{ spellDescriptions[spell.url].dc.dc_success }})</p>
         <p><strong>School:</strong> {{ spellDescriptions[spell.url].school.name }}</p>
-        <p><strong>Classes:</strong> {{ getClassNames(spellDescriptions[spell.url]) }}</p>
         <p><strong>Subclasses:</strong> {{ getSubclassNames(spellDescriptions[spell.url]) }}</p>
       </div>
       <p *ngIf="!spellDescriptions[spell.url]">Loading description...</p>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <div class="flex gap-3 mt-1">
+        <p-button label="Preparar" severity="secondary" class="w-full" styleClass="w-full"></p-button>
+      </div>
     </ng-template>
   </p-card>
 </div>

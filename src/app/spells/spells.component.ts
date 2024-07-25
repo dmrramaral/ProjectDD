@@ -1,9 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { DropdownModule } from 'primeng/dropdown';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
+import { forkJoin } from 'rxjs';
 import { Spell } from '../models/spell';
 import { SpellsService } from './spells.service';
-import { forkJoin } from 'rxjs';
+import { MessageService } from 'primeng/api';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 @Component({
   selector: 'app-spells',
   standalone: true,
@@ -11,9 +19,15 @@ import { forkJoin } from 'rxjs';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    ToastModule,
+    MessageModule,
+    DropdownModule,
+    ButtonModule,
+    CardModule
   ],
   templateUrl: './spells.component.html',
-  styleUrls: ['./spells.component.scss']
+  styleUrls: ['./spells.component.scss'],
+  providers: [MessageService]
 })
 export class SpellsComponent implements OnInit {
 
@@ -25,7 +39,10 @@ export class SpellsComponent implements OnInit {
   spellsLoaded: boolean = false;
 
 
-  constructor(private spellsService: SpellsService) { }
+  constructor(private spellsService: SpellsService,
+    private sanitizer: DomSanitizer,
+    private messageService: MessageService
+  ) { }
 
   ngOnInit(): void {
 
@@ -34,6 +51,16 @@ export class SpellsComponent implements OnInit {
     this.initializeSpells();
 
 
+
+
+  }
+
+  formatDescription(description: string[]): SafeHtml {
+    const formattedDescription = description.join(' ')
+      .replace(/\*\*\*(.*?)\*\*\*/g, '<strong></br>$1</strong>') // Bold
+      .replace(/\| (.*?) \|/g, '<table><tr><td>$1</td></tr></table>'); // Table (simplified)
+
+    return this.sanitizer.bypassSecurityTrustHtml(formattedDescription);
   }
 
 
@@ -56,10 +83,13 @@ export class SpellsComponent implements OnInit {
 
         this.spellsLoaded = true;
         this.sortSpellsByLevel();
-        console.log("Spells foram carregados com sucesso.");
-        console.log(this.spellsByClass);
+        this.showToast();
       });
     });
+  }
+
+  showToast(): void {
+    this.messageService.add({ severity: 'success', summary: 'Spells Loaded', detail: 'The spells have been successfully loaded.' });
   }
 
 

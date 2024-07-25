@@ -1,0 +1,34 @@
+
+<div *ngIf="spellsLoaded" class="notification">
+  Spells foram carregados com sucesso.
+</div>
+<select *ngIf="spellsLoaded" [(ngModel)]="selectedClass">
+  <option *ngFor="let class of classesData" [value]="class.index">{{ class.name }}</option>
+</select>
+<button *ngIf="spellsLoaded" (click)="filterSpellsByClass()">Filtrar Magias</button>
+
+<div *ngIf="spellsData.length > 0">
+  <div *ngFor="let spell of spellsData">
+    <h2>{{ spell.name }} (Level {{ spell.level }})</h2>
+    <div *ngIf="spellDescriptions[spell.url]">
+      <p><strong>Description:</strong> {{ spellDescriptions[spell.url].desc.join(' ') }}</p>
+      <p><strong>Range:</strong> {{ spellDescriptions[spell.url].range }}</p>
+      <p><strong>Components:</strong> {{ spellDescriptions[spell.url].components.join(', ') }}</p>
+      <p><strong>Ritual:</strong> {{ spellDescriptions[spell.url].ritual ? 'Yes' : 'No' }}</p>
+      <p><strong>Duration:</strong> {{ spellDescriptions[spell.url].duration }}</p>
+      <p><strong>Concentration:</strong> {{ spellDescriptions[spell.url].concentration ? 'Yes' : 'No' }}</p>
+      <p><strong>Casting Time:</strong> {{ spellDescriptions[spell.url].casting_time }}</p>
+      <p><strong>Damage:</strong> {{ spellDescriptions[spell.url].damage?.damage_at_character_level | json }}</p>
+      <p *ngIf="spellDescriptions[spell.url].dc"><strong>DC:</strong> {{ spellDescriptions[spell.url].dc.dc_type?.name }} ({{ spellDescriptions[spell.url].dc.dc_success }})</p>
+      <p><strong>School:</strong> {{ spellDescriptions[spell.url].school.name }}</p>
+      <p><strong>Classes:</strong> {{ getClassNames(spellDescriptions[spell.url]) }}</p>
+      <p><strong>Subclasses:</strong> {{ getSubclassNames(spellDescriptions[spell.url]) }}</p>
+    </div>
+    <p *ngIf="!spellDescriptions[spell.url]">Loading description...</p>
+  </div>
+</div>
+<ng-template *ngIf="spellsLoaded != true">
+  <p>Os Spells estão sendo carregados</p>
+</ng-template>
+
+

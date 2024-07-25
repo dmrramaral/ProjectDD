@@ -10,7 +10,9 @@ import { forkJoin } from 'rxjs';
 import { Spell } from '../models/spell';
 import { SpellsService } from './spells.service';
 import { MessageService } from 'primeng/api';
+import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
+import { InputNumberModule } from 'primeng/inputnumber';
 @Component({
   selector: 'app-spells',
   standalone: true,
@@ -22,7 +24,9 @@ import { ButtonModule } from 'primeng/button';
     MessageModule,
     DropdownModule,
     ButtonModule,
-    CardModule
+    CardModule,
+    InputTextModule,
+    InputNumberModule
   ],
   templateUrl: './spells.component.html',
   styleUrls: ['./spells.component.scss'],
@@ -36,6 +40,19 @@ export class SpellsComponent implements OnInit {
   selectedClass: string = ''; // Propriedade para armazenar a classe selecionada
   spellsByClass: { [className: string]: Spell[] } = {};
   spellsLoaded: boolean = false;
+
+  filterName!: string;
+  filterLevel!: number;
+  filterType!: string;
+  filterSchool!: string;
+
+  nameOptions: any[] = [];
+  levelOptions: any[] = [];
+  typeOptions: any[] = [];
+  schoolOptions: any[] = [];
+  filteredSpells: any[] = []; // Adicionando a propriedade filteredSpells
+
+
 
 
   constructor(private spellsService: SpellsService,
@@ -53,6 +70,25 @@ export class SpellsComponent implements OnInit {
 
 
   }
+
+  initializeFilters() {
+    // Inicializar opções de filtros
+    console.log(this.spellsData);
+    this.nameOptions = this.spellsData.map(spell => ({ name: spell.name }));
+    this.levelOptions = this.spellsData.map(spell => ({ level: spell.level }));
+    this.schoolOptions = this.spellsData.map(spell => ({ school: spell.school.name }));
+    console.log(this.nameOptions);
+  }
+
+  applyFilters() {
+    this.filteredSpells = this.spellsData.filter(spell => {
+      const matchesName = this.filterName ? spell.name.includes(this.filterName) : true;
+      const matchesLevel = this.filterLevel ? spell.level === this.filterLevel : true;
+      const matchesSchool = this.filterSchool ? spell.school.name.includes(this.filterSchool) : true;
+      return matchesName && matchesLevel && matchesSchool;
+    });
+  }
+
 
   formatDescription(description: string[]): SafeHtml {
     const formattedDescription = description.join(' ')
@@ -86,6 +122,7 @@ export class SpellsComponent implements OnInit {
 
         this.spellsLoaded = true;
         this.sortSpellsByLevel();
+        this.initializeFilters();
         this.showToast();
       });
     });
@@ -125,6 +162,7 @@ export class SpellsComponent implements OnInit {
         this.spellsService.getDescription(spell.url).subscribe(data => {
           this.spellDescriptions[spell.url] = data;
         });
+        this.initializeFilters();
       });
     } else {
       this.spellsData = [];

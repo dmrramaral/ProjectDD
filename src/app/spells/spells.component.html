@@ -1,16 +1,37 @@
 <p-toast></p-toast>
 
 
-<p-dropdown *ngIf="spellsLoaded" [(ngModel)]="selectedClass" [options]="classesData" optionLabel="name" optionValue="index" placeholder="Selecione uma classe"></p-dropdown>
+<p-dropdown *ngIf="spellsLoaded" [(ngModel)]="selectedClass" [options]="classesData" optionLabel="name"
+  optionValue="index" placeholder="Selecione uma classe"></p-dropdown>
 
 <p-button *ngIf="spellsLoaded" label="Filtrar Magias" icon="pi pi-filter" (click)="filterSpellsByClass()"></p-button>
 
+<div *ngIf="spellsLoaded">
+  <div class="filters">
+    <p-dropdown [(ngModel)]="filterName" [options]="nameOptions" optionLabel="name" placeholder="Filtrar por nome"
+      (onChange)="applyFilters()"></p-dropdown>
+    <p-dropdown [(ngModel)]="filterLevel" [options]="levelOptions" optionLabel="level" placeholder="Filtrar por nível"
+      (onChange)="applyFilters()"></p-dropdown>
+    <p-dropdown [(ngModel)]="filterSchool" [options]="schoolOptions" optionLabel="school"
+      placeholder="Filtrar por escola" (onChange)="applyFilters()"></p-dropdown>
+  </div>
+</div>
+
+<div *ngIf="filteredSpells.length > 0">
+  <div *ngFor="let spell of filteredSpells">
+    {{ spell.name }} - Level: {{ spell.level }} - School: {{ spell.school }}
+  </div>
+</div>
+
+
 <div *ngIf="spellsData.length > 0">
-  <p-card *ngFor="let spell of spellsData" [header]="spell.name + ' (Level ' + spell.level + ')'" subheader="Spell Details" [style]="{ width: '360px', margin: '1rem', font:'strong' }">
+  <p-card *ngFor="let spell of spellsData" [header]="spell.name + ' (Level ' + spell.level + ')'"
+    subheader="Spell Details" [style]="{ width: '360px', margin: '1rem', font:'strong' }">
 
     <ng-template pTemplate="content">
       <div *ngIf="spellDescriptions[spell.url]">
-        <p><strong>Description:</strong> <span [innerHTML]="formatDescription(spellDescriptions[spell.url].desc)"></span></p>
+        <p><strong>Description:</strong> <span
+            [innerHTML]="formatDescription(spellDescriptions[spell.url].desc)"></span></p>
         <p><strong>Range:</strong> {{ spellDescriptions[spell.url].range }}</p>
         <p><strong>Components:</strong> {{ spellDescriptions[spell.url].components.join(', ') }}</p>
         <p><strong>Ritual:</strong> {{ spellDescriptions[spell.url].ritual ? 'Yes' : 'No' }}</p>
@@ -25,7 +46,8 @@
             </li>
           </ul>
         </div>
-        <p *ngIf="spellDescriptions[spell.url].dc"><strong>DC:</strong> {{ spellDescriptions[spell.url].dc.dc_type?.name }} ({{ spellDescriptions[spell.url].dc.dc_success }})</p>
+        <p *ngIf="spellDescriptions[spell.url].dc"><strong>DC:</strong> {{ spellDescriptions[spell.url].dc.dc_type?.name
+          }} ({{ spellDescriptions[spell.url].dc.dc_success }})</p>
         <p><strong>School:</strong> {{ spellDescriptions[spell.url].school.name }}</p>
         <p><strong>Subclasses:</strong> {{ getSubclassNames(spellDescriptions[spell.url]) }}</p>
       </div>

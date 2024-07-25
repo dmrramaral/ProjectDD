@@ -27,8 +27,9 @@
     <p *ngIf="!spellDescriptions[spell.url]">Loading description...</p>
   </div>
 </div>
-<ng-template *ngIf="spellsLoaded != true">
+<div *ngIf="!spellsLoaded">
   <p>Os Spells estão sendo carregados</p>
-</ng-template>
+  <p>Aguarde um pouco</p>
+</div>
 
 

@@ -74,9 +74,19 @@ export class SpellsComponent implements OnInit {
   initializeFilters() {
     // Inicializar opções de filtros
     console.log(this.spellsData);
-    this.nameOptions = this.spellsData.map(spell => ({ name: spell.name }));
-    this.levelOptions = this.spellsData.map(spell => ({ level: spell.level }));
-    this.schoolOptions = this.spellsData.map(spell => ({ school: spell.school.name }));
+    // Usar Set para garantir que os nomes sejam únicos
+    const nameSet = new Set(this.spellsData.map(spell => spell.name));
+    this.nameOptions = Array.from(nameSet).map(name => ({ name }));
+
+    const levelSet = new Set(this.spellsData.map(spell => spell.level));
+    this.levelOptions = Array.from(levelSet).map(level => ({ level }));
+    this.schoolOptions = this.spellsData.reduce((options: any[], spell: Spell) => {
+      const schoolName = spell.school.name;
+      if (!options.some((option: any) => option.school === schoolName)) {
+        options.push({ school: schoolName });
+      }
+      return options;
+    }, []);
     console.log(this.nameOptions);
   }
 
